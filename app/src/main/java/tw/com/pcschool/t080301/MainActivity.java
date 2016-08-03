@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,12 +21,14 @@ import java.net.URL;
 public class MainActivity extends AppCompatActivity {
 
     ImageView img;
+    TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         img = (ImageView) findViewById(R.id.imageView);
+        tv = (TextView) findViewById(R.id.textView);
         MyTask task = new MyTask();
         task.execute("http://www.pcschool.com.tw/2015/images/logo.png");
     }
@@ -33,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
     class MyTask extends AsyncTask<String, Integer, Bitmap>
     {
 
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            tv.setText(String.valueOf(values[0]));
+        }
 
         @Override
         protected Bitmap doInBackground(String... params) {
@@ -53,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
                 while ((readSize = is.read(b)) > 0) {
                     bos.write(b, 0, readSize);
                     sum += readSize;
+
+                    publishProgress((int)sum);
+
                 }
                 byte[] result = bos.toByteArray();
                 Log.d("IMG", "to byte array finished array length:" + result.length);
